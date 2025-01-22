@@ -1,3 +1,6 @@
+"""
+Implements emotion detection functionality for client applications
+"""
 import requests
 import json
 
@@ -6,17 +9,17 @@ URL = "https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/Nl
 HEADERS = { "grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock" }
 
 def emotion_detector(text_to_analyze):
-    '''
+    """
     Leverages Watson AI API to detect and score the emotion(s) in the input text
-    '''
-    if not text_to_analyze or text_to_analyze == '': 
+    """
+    if not text_to_analyze or text_to_analyze == '':
         return EMPTY_RESPONSE # No sense in doing any work without valid input
 
     myobj = { "raw_document": { "text": text_to_analyze } }
     resp = requests.post(URL, json = myobj, headers=HEADERS)
 
     status = resp.status_code
-    if not 200 <= status < 300:
+    if status == 400:
         return EMPTY_RESPONSE
 
     data = json.loads(resp.text)
@@ -34,7 +37,7 @@ def emotion_detector(text_to_analyze):
     if disgust > hiScore:
         hiScore = disgust
         dominant = "disgust"
-    
+
     if fear > hiScore:
         hiScore = fear
         dominant = "fear"
@@ -42,7 +45,7 @@ def emotion_detector(text_to_analyze):
     if joy > hiScore:
         hiScore = joy
         dominant = "joy"
-    
+
     if sadness > hiScore:
         hiScore = sadness
         dominant = "sadness"

@@ -1,9 +1,12 @@
+"""
+Defines the web application routes and handler functions
+"""
 from flask import Flask, render_template, request
 from EmotionDetection.emotion_detection import emotion_detector
 
 app = Flask("Emotion Detection")
 
-RESULT_TEMPLATE = """For the given statement, the system response is 
+RESULT_TEMPLATE = """For the given statement, the system response is
                     'anger': {}, 
                     'disgust': {}, 
                     'fear': {}, 
@@ -13,10 +16,17 @@ RESULT_TEMPLATE = """For the given statement, the system response is
 
 @app.route("/")
 def render_home():
+    """
+    Handles requests for home or root endpoint
+    """
     return render_template('index.html')
 
 @app.route("/emotionDetector")
 def detect_emotion():
+    """
+    Handles GET requests for detecting emotion of input text
+    """
+
     # extract input from GET request
     text_to_analyze = request.args.get('textToAnalyze')
 
@@ -38,4 +48,4 @@ def detect_emotion():
     return RESULT_TEMPLATE.format(anger, disgust, fear, joy, sadness, dominant_emotion)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)
