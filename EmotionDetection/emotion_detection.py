@@ -1,12 +1,25 @@
 import requests
 import json
 
+EMPTY_RESPONSE = { "anger": None, "disgust": None, "fear": None, "joy": None, "sadness": None, "dominant_emotion": None }
+URL = "https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict"
+HEADERS = { "grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock" }
+
 def emotion_detector(text_to_analyze):
-    url = "https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict"
-    headers = { "grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock" }
+    '''
+    Leverages Watson AI API to detect and score the emotion(s) in the input text
+    '''
+    if not text_to_analyze or text_to_analyze == '': 
+        return EMPTY_RESPONSE # No sense in doing any work without valid input
+
     myobj = { "raw_document": { "text": text_to_analyze } }
-    response = requests.post(url, json = myobj, headers=headers)
-    data = json.loads(response.text)
+    resp = requests.post(URL, json = myobj, headers=HEADERS)
+
+    status = resp.status_code
+    if not 200 <= status < 300:
+        return EMPTY_RESPONSE
+
+    data = json.loads(resp.text)
 
     # extract useful data
     anger = data["emotionPredictions"][0]["emotion"]["anger"]
@@ -16,29 +29,22 @@ def emotion_detector(text_to_analyze):
     sadness = data["emotionPredictions"][0]["emotion"]["sadness"]
 
     hiScore = anger
-    dominant_emotion = "anger"
+    dominant = "anger"
 
     if disgust > hiScore:
         hiScore = disgust
-        dominant_emotion = "disgust"
+        dominant = "disgust"
     
     if fear > hiScore:
         hiScore = fear
-        dominant_emotion = "fear"
+        dominant = "fear"
 
     if joy > hiScore:
         hiScore = joy
-        dominant_emotion = "joy"
+        dominant = "joy"
     
     if sadness > hiScore:
         hiScore = sadness
-        dominant_emotion = "sadness"
+        dominant = "sadness"
 
-    return {
-        "anger": anger,
-        "disgust": disgust,
-        "fear": fear,
-        "joy": joy,
-        "sadness": sadness,
-        "dominant_emotion": dominant_emotion
-    }
+    return { "anger": anger, "disgust": disgust, "fear": fear, "joy": joy, "sadness": sadness, "dominant_emotion": dominant }

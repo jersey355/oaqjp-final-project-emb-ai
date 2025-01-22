@@ -24,12 +24,15 @@ def detect_emotion():
     data = emotion_detector(text_to_analyze)
 
     # extract data from response
+    dominant_emotion = data['dominant_emotion']
+    if dominant_emotion is None:
+        return "Invalid text! Please try again!"
+
     anger = data['anger']
     disgust = data['disgust']
     fear = data['fear']
     joy = data['joy']
     sadness = data['sadness']
-    dominant_emotion = data['dominant_emotion']
 
     # return formatted result
     return RESULT_TEMPLATE.format(anger, disgust, fear, joy, sadness, dominant_emotion)
